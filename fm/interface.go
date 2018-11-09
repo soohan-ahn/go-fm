@@ -100,10 +100,10 @@ func Train(f AbstractFM, p Params) {
 				}
 
 				wg.Add(1)
-				go func() {
+				go func(coreNum int) {
 					defer wg.Done()
 					lineNum++
-					log.Printf("Training line: %d, on core: %d\n", lineNum, i)
+					log.Printf("Training line: %d, on core: %d\n", lineNum, coreNum)
 
 					feature := []uint32{}
 					label, err := strconv.ParseFloat(weights[len(weights)-1], 3)
@@ -122,7 +122,7 @@ func Train(f AbstractFM, p Params) {
 					predicted := f.Predict(feature, sum, squareSum, p)
 					delta := label - predicted
 					f.Train(feature, label, delta, sum)
-				}()
+				}(i)
 			}
 
 			wg.Wait()

@@ -4,29 +4,36 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	//"runtime"
 
-	"./fm"
+	"github.com/soohanboys/go-fm/fm"
 )
 
 func train(p fm.Params) {
 	var model fm.AbstractFM
-	if d := *(p.Degree); d == 2 {
-		model = &fm.FM{}
-	} else {
-		//model = fm.MFM{}
-	}
+	model = &fm.FM{}
+	/*
+		TODO:
+		if d := *(p.Degree); d == 2 {
+			model = &fm.FM{}
+		} else {
+			model = fm.MFM{}
+		}
+	*/
 	fm.Init(model, p)
 	fm.Train(model, p)
 }
 
 func predict(p fm.Params) {
 	var model fm.AbstractFM
-	if d := *(p.Degree); d == 2 {
-		model = &fm.FM{}
-	} else {
-		//model = fm.MFM{}
-	}
+	model = &fm.FM{}
+	/*
+		TODO:
+		if d := *(p.Degree); d == 2 {
+			model = &fm.FM{}
+		} else {
+			model = fm.MFM{}
+		}
+	*/
 	fm.Init(model, p)
 	fm.Predict(model, p)
 }

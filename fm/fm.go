@@ -2,10 +2,10 @@ package fm
 
 import (
 	"bufio"
-	//"encoding/csv"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math"
 	"os"
 	"regexp"
 	"strconv"
@@ -54,7 +54,6 @@ func (fm *FM) InitWeights(p Params) {
 	dat, err := ioutil.ReadFile(*(p.WeightFileName))
 	if err != nil {
 		log.Printf("Err: %v\n", err)
-		//fm.initWeightsByRandomly()
 		return
 	}
 
@@ -118,6 +117,11 @@ func (fm *FM) InitWeights(p Params) {
 	}
 }
 
+func (fm *FM) ActivationFunction(val float64) float64 {
+	// SIGMOID
+	return 1.0 / (1.0 + math.Exp(-1*val))
+}
+
 func (fm *FM) Predict(features []uint32, sum []float64, squareSum []float64, p Params) float64 {
 	result := 0.0
 	for _, x := range features {
@@ -128,16 +132,16 @@ func (fm *FM) Predict(features []uint32, sum []float64, squareSum []float64, p P
 		result += ((sum[i]*sum[i] - squareSum[i]) * 0.5)
 	}
 
-	return result
+	return fm.ActivationFunction(result)
 }
 
 func (fm *FM) CalcSums(features []uint32, p Params) ([]float64, []float64) {
 	sum := make([]float64, *(p.MaxDimension))
 	squareSum := make([]float64, *(p.MaxDimension))
 	for _, f := range features {
-		for i := 0; i < *(p.MaxDimension); i++ {
-			sum[i] += fm.InterWeights[i][f]
-			squareSum[i] += (fm.InterWeights[i][f] * fm.InterWeights[i][f])
+		for i := 0; i < *p.MaxNonzeroDimension; i++ {
+			sum[i] += fm.InterWeights[f][i]
+			squareSum[i] += (fm.InterWeights[f][i] * fm.InterWeights[f][i])
 		}
 	}
 
@@ -160,7 +164,6 @@ func (fm *FM) SaveWeights(p Params) {
 	log.Printf("Saving weights..\n")
 	for i := range fm.Weights {
 		line := fmt.Sprintf("%d:%f\n", i, fm.Weights[i])
-		fmt.Printf("%d:%f\n", i, fm.Weights[i])
 		_, err := ww.Write([]byte(line))
 		if err != nil {
 			log.Printf("Err: %v\n", err)
@@ -195,7 +198,6 @@ func (fm *FM) SaveWeights(p Params) {
 		}
 		if str != "" {
 			line := fmt.Sprintf("%d:[%s]\n", i, str)
-			log.Printf("%d:[%s]", i, str)
 			_, err := w.Write([]byte(line))
 			if err != nil {
 				log.Printf("Err: %v\n", err)
