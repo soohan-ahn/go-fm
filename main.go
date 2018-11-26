@@ -69,10 +69,14 @@ func main() {
 	predictCmd := flag.NewFlagSet("predict", flag.ExitOnError)
 	predictInputParams := fm.Params{
 		WeightFileName:      predictCmd.String("weight_file_name", "", "Filename of the weights."),
+		InterWeightFileName: predictCmd.String("inter_weight_file_name", "", "Filename of the weights."),
 		PredictFileName:     predictCmd.String("predict_file_name", "", "Filename of the features to predict."),
 		Degree:              predictCmd.Int("d", 2, "degree for the prediction"),
-		MaxNonzeroDimension: predictCmd.Int("maxnzd", 30, "Max dimension for the training."),
-		MaxDimension:        predictCmd.Int("maxd", 30, "Max dimension for the training. (Hivemall=16777216)"),
+		MaxNonzeroDimension: predictCmd.Int("maxnzd", 30, "Max dimension for the predicting."),
+		MaxDimension:        predictCmd.Int("maxd", 30, "Max dimension for the predicting. (Hivemall=16777216)"),
+		TrainR0:             predictCmd.Float64("reg0", 0.0, "reg value for SGD."),
+		TrainRW:             predictCmd.Float64("regw", 0.0, "reg value for SGD."),
+		TrainRV:             predictCmd.Float64("regv", 0.0, "reg value for SGD."),
 	}
 
 	switch os.Args[1] {

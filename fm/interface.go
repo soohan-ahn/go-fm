@@ -6,6 +6,7 @@ import (
 	"hash/adler32"
 	"io"
 	"log"
+	"math"
 	"os"
 	"runtime"
 	"strconv"
@@ -41,6 +42,11 @@ func Init(f AbstractFM, p Params) {
 	f.Init(p)
 }
 
+func Sigmoid(val float64) float64 {
+	// SIGMOID
+	return 1.0 / (1.0 + math.Exp(-1*val))
+}
+
 func Predict(f AbstractFM, p Params) {
 	// Extract from csv file.
 	// extractFeatures extract features from a csv file.
@@ -53,6 +59,9 @@ func Predict(f AbstractFM, p Params) {
 	r := csv.NewReader(bufio.NewReader(file))
 
 	features := [][]uint32{}
+	pos := 0
+	neg := 0
+	tot := 0
 	for {
 		weights, err := r.Read()
 		if err != nil {
@@ -62,16 +71,29 @@ func Predict(f AbstractFM, p Params) {
 			log.Printf("Err: %v\n", err)
 			continue
 		}
+		tot += 1
 
 		feature := []uint32{}
 		for _, weight := range weights {
+			//if i == (len(weights) - 1) {
+			//	break
+			//}
 			featureNum := (adler32.Checksum([]byte(weight)) / 10) % uint32(*p.MaxDimension)
 			feature = append(feature, featureNum)
 		}
 		features = append(features, feature)
-		log.Printf("feature: %v\n", feature)
-		//f.Predict(feature, p)
+		sum, squareSum := f.CalcSums(feature, p)
+		predicted := f.Predict(feature, sum, squareSum, p)
+		sign := 1.0
+		if predicted <= 0.0 {
+			sign = -1.0
+			neg += 1
+		} else {
+			pos += 1
+		}
+		log.Printf("%v,%v\n", feature, sign)
 	}
+	log.Printf("Pos: %v, Neg: %v, Tot: %v\n", pos, neg, tot)
 }
 
 func Train(f AbstractFM, p Params) {
@@ -120,7 +142,10 @@ func Train(f AbstractFM, p Params) {
 
 					sum, squareSum := f.CalcSums(feature, p)
 					predicted := f.Predict(feature, sum, squareSum, p)
-					delta := label - predicted
+					//return Sigmoid(result)
+					//delta = (0.0f - sigmoid(-mFuncValue * y) * y)
+					//delta := 0.0 - Sigmoid(-predicted*label)*label
+					delta := -label * (1.0 - Sigmoid(label*-predicted))
 					f.Train(feature, label, delta, sum)
 				}(i)
 			}

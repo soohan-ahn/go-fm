@@ -21,6 +21,7 @@ func (s LogisticFMSGD) LearnW0(w0 *float64, delta float64) {
 func (s LogisticFMSGD) LearnW(weights []float64, features []uint32, delta float64, label float64) {
 	for _, feature := range features {
 		gradient := label
+		//delta = (0.0f - sigmoid(-mFuncValue * y) * y)
 		weights[feature] = s.LearnRate * (delta*gradient + s.TrainRW*(weights[feature]))
 	}
 }
@@ -28,7 +29,8 @@ func (s LogisticFMSGD) LearnW(weights []float64, features []uint32, delta float6
 func (s LogisticFMSGD) LearnV(interWeights [][]float64, features []uint32, delta float64, label float64, sums []float64) {
 	for _, feature := range features {
 		for i, _ := range interWeights[feature] {
-			gradient := sums[feature]*label - interWeights[feature][i]*label*label
+			gradient := sums[feature] - interWeights[feature][i]
+			//delta = (0.0f - sigmoid(-mFuncValue * y) * y)
 			interWeights[feature][i] = s.LearnRate * (delta*gradient + s.TrainRV*(interWeights[feature][i]))
 		}
 	}

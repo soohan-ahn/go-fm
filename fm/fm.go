@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"math"
+	"math/rand"
 	"os"
 	"regexp"
 	"strconv"
@@ -37,13 +37,15 @@ func (fm *FM) InitWeights(p Params) {
 	fm.W0 = 0.0
 	fm.Weights = make([]float64, *p.MaxDimension)
 	for i := range fm.Weights {
-		fm.Weights[i] = 0.1
+		sample := rand.NormFloat64() * 0.05
+		fm.Weights[i] = sample
 	}
 	fm.InterWeights = make([][]float64, *p.MaxDimension)
 	for i := range fm.InterWeights {
 		fm.InterWeights[i] = make([]float64, *p.MaxNonzeroDimension)
 		for j := range fm.InterWeights[i] {
-			fm.InterWeights[i][j] = 0.1
+			sample := rand.NormFloat64() * 0.05
+			fm.InterWeights[i][j] = sample
 		}
 	}
 
@@ -117,11 +119,6 @@ func (fm *FM) InitWeights(p Params) {
 	}
 }
 
-func (fm *FM) ActivationFunction(val float64) float64 {
-	// SIGMOID
-	return 1.0 / (1.0 + math.Exp(-1*val))
-}
-
 func (fm *FM) Predict(features []uint32, sum []float64, squareSum []float64, p Params) float64 {
 	result := 0.0
 	for _, x := range features {
@@ -132,7 +129,8 @@ func (fm *FM) Predict(features []uint32, sum []float64, squareSum []float64, p P
 		result += ((sum[i]*sum[i] - squareSum[i]) * 0.5)
 	}
 
-	return fm.ActivationFunction(result)
+	return result
+	//return fm.ActivationFunction(result)
 }
 
 func (fm *FM) CalcSums(features []uint32, p Params) ([]float64, []float64) {
