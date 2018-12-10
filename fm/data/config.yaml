@@ -1,0 +1,14 @@
+sgd:
+    r0: 0.0
+    rw: 0.0
+    rv: 0.0
+fm:
+    degree: 2
+    kfactor: 5
+    max_dimension: 100000
+    epoch: 1
+files:
+    weight_file_name: ctr_weight.csv
+    inter_file_name: ctr_inter_weight.csv
+    predict_file_name: for_validation/test.csv
+    train_data_file_name: for_validation/train.csv
