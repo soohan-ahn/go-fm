@@ -1,2 +1,17 @@
 ## go-fm
-./go-fm train --train_data_file_name=ctr_train_data.csv --inter_weight_file_name=ctr_inter_weight.csv --weight_file_name=ctr_weight.csv --reg0=0.1 --regw=0.1 --regv=0.1 --maxd=1700
+Facorization Machine implemented in Go.
+Reference paper: [Factorization Machines](https://www.csie.ntu.edu.tw/~b97053/paper/Rendle2010FM.pdf)
+
+### train
+./go-fm train
+
+### predict
+./go-fm predict
+
+### config.yaml
+* Set all the parameters needed for the train/predict on the fm/data/config.yaml
+* Parameters
+    * sgd: Parameters needed for the SGD training step.
+    * fm: Set the numbers needed for the FM.
+        * Currently, only the logic is implemeted for degree=2.
+    * files: Set the paths of the predict/train/weight files.
